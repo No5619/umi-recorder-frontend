@@ -16,11 +16,11 @@
         <div class="fake_form">
             <div class="data">
                 <label>Username</label>
-                <input type="text" ref="username" required>
+                <input type="text" v-model="username" required>
             </div>
             <div class="data">
                 <label>Password</label>
-                <input type="password" ref="password" required>
+                <input type="password" v-model="password" required>
             </div>
               <div class="forgot-pass"><a href=""><!--Forgot Password?-->&#8203;</a></div>
             <div class="btn">
@@ -46,6 +46,8 @@ export default {
     data() {
           return {
             login_signup: "login",
+            username: "",
+            password: ""
           }
       },
     methods:{
@@ -66,29 +68,24 @@ export default {
       send_data(){
         let self = this;
         let login_signup = {
-          "login_signup_flag": this.login_signup,
-          "username": this.$refs['username'].value,
-          "password": this.$refs['password'].value
+          "login_signup_flag": self.login_signup,
+          "username": self.username,
+          "password": self.password
         }
         
-        let url = "http://localhost:8080/api/post/login_signup/";
-        fetch(url, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json; charset=utf-8",
-              "Access-Control-Allow-Origin": "*"
+        console.log(login_signup);
 
-            },
-            //別忘了把主體参數轉成字串，否則資料會變成[object Object]，它無法被成功儲存在後台
-            //body: JSON.stringify(body)
-            body: JSON.stringify(login_signup)
-        })
-        .then(response => response.json())
-        .then(json => console.log(json))
-        .catch(error => {
-          this.errorMessage = error;
-          console.log(error);
-        });
+        let url = "http://localhost:8080/api/post/login_signup/";
+
+        self.$apiUtil.postApi(url, login_signup,
+                      response => {
+                        console.log(response.json())
+                      },
+                      error => {
+                        this.errorMessage = error;
+                        console.log(error);
+                      });
+                     
         self.$router.push({path: 'VideosListPage'});
       }
     }

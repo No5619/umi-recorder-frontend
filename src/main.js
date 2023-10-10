@@ -6,9 +6,12 @@ import VueRouter from 'vue-router'
 import router from './router'
 //引入bootstrap_css
 import "bootstrap/dist/css/bootstrap.min.css"
+//引入global function
+import ApiUtil from "./plugins/ApiUtil.js"
 
 //应用插件
 Vue.use(VueRouter)
+Vue.use(ApiUtil)
 
 Vue.config.productionTip = false
 
