@@ -88,6 +88,20 @@
         components: {
             SideNav
         },
+        //監聽路由轉換，關閉側邊欄
+        watch:{
+                $route:{
+                    handler: function(val,oldval){
+                        if(val.path != oldval.path){
+                            //收縮側邊欄
+                           this.show_side_nav = false
+                           this.$refs['side_nav'].style.display = 'none';
+                        }
+                        //console.log("監聽val"+val.path); //測試
+                        //console.log("監聽oldval"+oldval.path); //測試
+                    }
+                }
+        },
         created(){
             //add font awesome script tag
             let font_awesome = document.createElement('script');    
