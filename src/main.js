@@ -6,19 +6,34 @@ import VueRouter from 'vue-router'
 import router from './router'
 //引入bootstrap_css
 import "bootstrap/dist/css/bootstrap.min.css"
+//引入bootstrap_js
+import "bootstrap/dist/js/bootstrap.js"
+
 //引入global function
 import ApiUtil from "./plugins/ApiUtil.js"
+import Cache from "./plugins/Cache.js"
 
 //应用插件
 Vue.use(VueRouter)
 Vue.use(ApiUtil)
+Vue.use(Cache)
 
 Vue.config.productionTip = false
 
-new Vue({
+const vm = new Vue({
   render: h => h(App),
   router: router
 }).$mount('#app')
 
-//引入bootstrap_js
-import "bootstrap/dist/js/bootstrap.js"
+
+
+router.beforeEach((to, from, next) => {
+
+	if (to.path != from.path) {
+		if (vm.__proto__.$cache.loggedin == false && to.path != "/"){
+			router.push({path: '/'});
+    }
+
+    next();
+  }
+})

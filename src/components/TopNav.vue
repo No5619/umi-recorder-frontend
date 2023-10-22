@@ -14,30 +14,22 @@
                     <option value="rec">&#xf03d;</option>
                     <option value="vid">&#xf167;</option>
                 </select>
-                <input type="text" name="" placeholder="please input url" ref="input">
-                <button>Enter</button>
+                <input type="text" name="" placeholder="please input url for recording" ref="input">
+                <button @click="input_rec_or_vid">Enter</button>
             </div>
             <div class="right_part">
-                <!-- login -->
-                <!-- 
-                <div id="login_bar" ref="login_bar">
-                    <i class="fa-solid fa-user-plus fa-lg" 
-                        id="login_icon" ref="login_icon"  v-on:click="login()"
-                        style="margin-right:12px; cursor:pointer;" 
-                    ></i>
-                </div>
-                 -->
                 <div id="loggedin_bar" ref="loggedin_bar">
-                    <!-- loggedin -->
+                    <!-- 
                     <i class="fa-solid fa-user fa-lg" 
                         id="loggedin_icon" ref="loggedin_icon"
                         style="margin-right:12px; cursor:pointer;" 
                     ></i>
+                     -->
                     <!-- logout -->
                     <i class="fa-solid fa-right-from-bracket fa-lg" 
                         id="logout_icon" ref="logout_icon"
                         style="margin-right:12px; cursor:pointer;" 
-                    ></i>
+                    @click="logout"></i>
                 </div>
             </div>
         </div>
@@ -72,21 +64,60 @@
             selectOnChange(event){
                 this.rec_or_vid = event.target.value;
                 if (this.rec_or_vid == "rec") {
-                    this.$refs['input'].placeholder = 'please input url';
+                    this.$refs['input'].placeholder = 'please input url for recording';
                 } else {
                     this.$refs['input'].placeholder = 'search recorded videos';
                 }
                 //console.log(event.target.value);
                 //console.log("this.rec_or_vid = " + this.rec_or_vid);
             },
-            login(){
-                //TODO: route to login page
+            input_rec_or_vid(){
+                let self = this;
 
-                //console.log("clicked login_icon");
+                if (self.rec_or_vid == "rec") {
+                    console.log("rec");
+                } else if(self.rec_or_vid == "vid") {
+                    let url = "http://localhost:8080/echo"
+                    let data = {input: "hello"}
+                    self.$apiUtil.getApi(url, data,
+                      resp => {
+                        console.log(resp.msg);
+                      },
+                      () => {
+                        alert("系統錯誤");
+                      });
+                    self.$apiUtil.postApi(url, data,
+                      resp => {
+                        console.log(resp.msg);
+                      },
+                      () => {
+                        alert("系統錯誤");
+                      });
+                }
+            },
+            logout(){
+                let self = this;
+                self.$apiUtil.postNoRespApi("http://localhost:8080/auth/logout", null, () => {
+                    self.$cache.loggedin = false;
+                    self.$router.push({path: '/'});
+                });
             }
         },
         components: {
             SideNav
+        },
+        //監聽路由轉換
+        watch:{
+                $route:{
+                    handler: function(val,oldval){
+                        if(val.path != oldval.path){
+                            if (val.path !== "/")
+                                this.$refs['loggedin_bar'].style.display = 'block';
+                            else
+                                this.$refs['loggedin_bar'].style.display = 'none';
+                        }
+                    }
+                }
         },
         created(){
             //add font awesome script tag

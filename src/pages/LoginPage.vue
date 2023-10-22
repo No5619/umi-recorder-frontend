@@ -14,9 +14,13 @@
         <label for="show" class="close-btn fas fa-times" title="close"></label>
         <div class="text" ref="form_icon">Login</div>
         <div class="fake_form">
+            <div class="data" v-show="showNameInput">
+              <label>Name</label>
+              <input type="text" v-model="name" required>
+            </div>
             <div class="data">
-                <label>Username</label>
-                <input type="text" v-model="username" required>
+                <label>Email</label>
+                <input type="text" v-model="email" required>
             </div>
             <div class="data">
                 <label>Password</label>
@@ -46,8 +50,9 @@ export default {
     data() {
           return {
             login_signup: "login",
-            username: "",
-            password: ""
+            email: "",
+            password: "",
+            name: ""
           }
       },
     methods:{
@@ -67,28 +72,50 @@ export default {
       },
       send_data(){
         let self = this;
-        let login_signup = {
-          "login_signup_flag": self.login_signup,
-          "username": self.username,
-          "password": self.password
+
+        let url;
+        let data;
+        if (self.login_signup == "login") {
+          url = "http://localhost:8080/auth/login";
+          data = {
+            "email": self.email,
+            "password": self.password
+          }
         }
-        
-        console.log(login_signup);
-
-        let url = "http://localhost:8080/api/post/login_signup/";
-
-        self.$apiUtil.postApi(url, login_signup,
+        if (self.login_signup == "signup") {
+          url = "http://localhost:8080/auth/signup";
+          data = {
+            "email": self.email,
+            "password": self.password,
+            "name": self.name
+          }
+        }
+        self.$apiUtil.postApi(url, data,
                       response => {
-                        console.log(response.json())
+                        if (response.status === 401 || response.status === 400) {
+                          alert(response.msg);
+                          return;
+                        }
+                        self.$cache.loggedin = true;
+                        self.$router.push({path: 'VideosListPage'});
                       },
-                      error => {
-                        this.errorMessage = error;
-                        console.log(error);
+                      () => {
+                        alert("系統錯誤");
                       });
                      
-        self.$router.push({path: 'VideosListPage'});
+        //self.$router.push({path: 'VideosListPage'});
       }
-    }
+    },
+    computed: {
+      showNameInput() {
+        if (this.login_signup == "signup")
+          return true;
+        else if(this.login_signup == "login")
+          return false;
+
+        return false;
+      }
+    },
 }
 </script>
 
