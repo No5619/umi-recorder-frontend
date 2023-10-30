@@ -28,6 +28,10 @@ const vm = new Vue({
 
 
 router.beforeEach((to, from, next) => {
+  if (document.cookie.match(/logged-in=true/) == null)
+    vm.__proto__.$cache.loggedin = false;
+  else
+    vm.__proto__.$cache.loggedin = true;
 
 	if (to.path != from.path) {
 		if (vm.__proto__.$cache.loggedin == false && to.path != "/"){

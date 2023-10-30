@@ -47,7 +47,6 @@
             return {
                 show_side_nav: false,
                 rec_or_vid: "rec",
-                loggedin: false
 
             }
         },
@@ -98,6 +97,9 @@
             logout(){
                 let self = this;
                 self.$apiUtil.postNoRespApi("http://localhost:8080/auth/logout", null, () => {
+                    //remove cookie
+                    document.cookie = "logged-in=true; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
                     self.$cache.loggedin = false;
                     self.$router.push({path: '/'});
                 });
@@ -106,35 +108,12 @@
         components: {
             SideNav
         },
-        //監聽路由轉換
-        watch:{
-                $route:{
-                    handler: function(val,oldval){
-                        if(val.path != oldval.path){
-                            if (val.path !== "/")
-                                this.$refs['loggedin_bar'].style.display = 'block';
-                            else
-                                this.$refs['loggedin_bar'].style.display = 'none';
-                        }
-                    }
-                }
-        },
         created(){
             //add font awesome script tag
             let font_awesome = document.createElement('script');    
             font_awesome.setAttribute('src',"https://kit.fontawesome.com/3f581f8d46.js");
             font_awesome.setAttribute('crossorigin',"anonymous");
             document.head.appendChild(font_awesome);
-        },
-        mounted(){
-            //choose to display login_bar or loggedin_bar
-            if (this.loggedin) {
-                //this.$refs['login_bar'].style.display = 'none';
-                this.$refs['loggedin_bar'].style.display = 'block';
-            } else {
-                //this.$refs['login_bar'].style.display = 'block';
-                this.$refs['loggedin_bar'].style.display = 'none';
-            }
         }
 
     }

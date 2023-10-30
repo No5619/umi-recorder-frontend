@@ -10,7 +10,7 @@
       <label class="show-label" >Please Login/Sinup first.</label>
       <label for="show" class="show-btn">Login/Signup</label>
     </div>
-    <div class="form_container">
+    <div class="form_container" style="z-index: 1000000;">
         <label for="show" class="close-btn fas fa-times" title="close"></label>
         <div class="text" ref="form_icon">Login</div>
         <div class="fake_form">
@@ -26,7 +26,16 @@
                 <label>Password</label>
                 <input type="password" v-model="password" required>
             </div>
-              <div class="forgot-pass"><a href=""><!--Forgot Password?-->&#8203;</a></div>
+            <div class="data">
+              <a href="javascript:void(0)" @click="createCaptcha" style="color: black;">
+                <label>captcha: </label>
+                <img :src="captchaImg" style="width:50%; height:32px;" alt="loading..."/>
+              </a>
+              <input type="text" v-model="captchaCode" required>
+            </div>
+            <div class="forgot-pass">
+              <a href="http://localhost:8080/oauth2/authorization/google"> login from Google&#8203;</a>
+            </div>
             <div class="btn">
                 <div class="inner"></div>
                 <button @click="send_data">enter</button>
@@ -52,7 +61,9 @@ export default {
             login_signup: "login",
             email: "",
             password: "",
-            name: ""
+            name: "",
+            captchaImg: "",
+            captchaCode: ""
           }
       },
     methods:{
@@ -79,7 +90,8 @@ export default {
           url = "http://localhost:8080/auth/login";
           data = {
             "email": self.email,
-            "password": self.password
+            "password": self.password,
+            "captchaCode": self.captchaCode
           }
         }
         if (self.login_signup == "signup") {
@@ -87,7 +99,8 @@ export default {
           data = {
             "email": self.email,
             "password": self.password,
-            "name": self.name
+            "name": self.name,
+            "captchaCode": self.captchaCode
           }
         }
         self.$apiUtil.postApi(url, data,
@@ -96,14 +109,26 @@ export default {
                           alert(response.msg);
                           return;
                         }
+                        console.log("redirect");
                         self.$cache.loggedin = true;
                         self.$router.push({path: 'VideosListPage'});
                       },
                       () => {
                         alert("系統錯誤");
                       });
-                     
-        //self.$router.push({path: 'VideosListPage'});
+      },
+      createCaptcha() {
+        fetch('http://localhost:8080/auth/api/getCode', {
+                method: 'GET',
+                credentials: "include",
+              })
+              .then(resp => resp.text())
+              .then(resp => {
+                this.captchaImg = "data:image/jpeg;base64," + resp;
+              })
+              .catch(error => {
+                console.error('Error:', error);
+              });
       }
     },
     computed: {
@@ -115,6 +140,10 @@ export default {
 
         return false;
       }
+    },
+    mounted() {
+      let self = this;
+      self.createCaptcha();
     },
 }
 </script>
