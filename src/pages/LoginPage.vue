@@ -1,316 +1,479 @@
 <template>
-<div class="fake_body">
+  <div class="fake_body">
 
-<div class="hide_top_nav"></div>
+    <div class="hide_top_nav"></div>
 
-<div class="center">
-    <input type="checkbox" id="show">
-    <label class="show-icon" >UmiRecorder</label>
-    <div class="show-label-btn">
-      <label class="show-label" >Please Login/Sinup first.</label>
-      <label for="show" class="show-btn">Login/Signup</label>
-    </div>
-    <div class="form_container" style="z-index: 1000000;">
+    <div class="center">
+      <input type="checkbox" id="show">
+      <label class="show-icon">UmiRecorder</label>
+      <div class="show-label-btn">
+        <label class="show-label">Please Login/Sinup first.</label>
+        <label for="show" class="show-btn">Login/Signup</label>
+      </div>
+      <div class="form_container" style="z-index: 1000000;">
         <label for="show" class="close-btn fas fa-times" title="close"></label>
         <div class="text" ref="form_icon">Login</div>
-        <div class="fake_form">
-            <div class="data" v-show="showNameInput">
-              <label>Name</label>
-              <input type="text" v-model="name" required>
-            </div>
-            <div class="data">
-                <label>Email</label>
-                <input type="text" v-model="email" required>
-            </div>
-            <div class="data">
-                <label>Password</label>
-                <input type="password" v-model="password" required>
-            </div>
-            <div class="data">
-              <a href="javascript:void(0)" @click="createCaptcha" style="color: black;">
-                <label>captcha: </label>
-                <img :src="captchaImg" style="width:50%; height:32px;" alt="loading..."/>
-              </a>
-              <input type="text" v-model="captchaCode" required>
-            </div>
-            <div class="forgot-pass">
-              <a href="http://localhost:8080/oauth2/authorization/google"> login from Google&#8203;</a>
-            </div>
-            <div class="btn">
-                <div class="inner"></div>
-                <button @click="send_data">enter</button>
-            </div>
-            <div class="signup-link" >
-              <a style="cursor:pointer;" v-on:click="login_signup_btn" ref="login_signup_btn">
-                Sign Up
-              </a>
-            </div>
-          </div>
-    </div>
-</div>
 
-</div>
+        <!--第三方登入-->
+        <div class="third_form">
+          <a  class="icon-button twitter">
+            <i class="fab fa-twitter"></i><span></span>
+          </a>
+          <a  class="icon-button facebook">
+            <i class="fab fa-facebook"></i>
+            <span></span>
+          </a>
+          <a href="http://localhost:8080/oauth2/authorization/google" class="icon-button google-plus">
+            <i class="fab fa-google"></i>
+            <span></span>
+          </a>
+        </div>
+
+        <p class="or"><span>or</span></p>
+
+        <div class="fake_form">
+          <div class="data" v-show="showNameInput">
+            <label>Name</label>
+            <input type="text" v-model="name" required>
+          </div>
+          <div class="data">
+            <label>Email</label>
+            <input type="text" v-model="email" required>
+          </div>
+          <div class="data">
+            <label>Password</label>
+            <input type="password" v-model="password" required>
+          </div>
+          <div class="data">
+            <a href="javascript:void(0)" @click="createCaptcha" style="color: black;">
+              <label>captcha: </label>
+              <img :src="captchaImg" style="width:50%; height:32px;" alt="loading..." />
+            </a>
+            <input type="text" v-model="captchaCode" required>
+          </div>
+          <div class="forgot-pass">
+            <a href="http://localhost:8080/oauth2/authorization/google"> login from Google&#8203;</a>
+          </div>
+          <div class="btn">
+            <div class="inner"></div>
+            <button @click="send_data">enter</button>
+          </div>
+          <div class="signup-link">
+            <a style="cursor:pointer;" v-on:click="login_signup_btn" ref="login_signup_btn">
+              Sign Up
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </template>
   
 <script>
 
 export default {
-    name: 'LoginButton',
-    data() {
-          return {
-            login_signup: "login",
-            email: "",
-            password: "",
-            name: "",
-            captchaImg: "",
-            captchaCode: ""
-          }
-      },
-    methods:{
-      login_signup_btn(){
-        if (this.login_signup == "login") {
-          this.$refs['form_icon'].innerText = 'Sign Up';
-          this.$refs['login_signup_btn'].innerText = "Login";
-          this.login_signup = "signup";
+  name: 'LoginButton',
+  data() {
+    return {
+      login_signup: "login",
+      email: "",
+      password: "",
+      name: "",
+      captchaImg: "",
+      captchaCode: ""
+    }
+  },
+  methods: {
+    login_signup_btn() {
+      if (this.login_signup == "login") {
+        this.$refs['form_icon'].innerText = 'Sign Up';
+        this.$refs['login_signup_btn'].innerText = "Login";
+        this.login_signup = "signup";
 
-        } else if(this.login_signup == "signup") {
-          this.$refs['form_icon'].innerText = 'Login';
-          this.$refs['login_signup_btn'].innerText = "Signup";
-          this.login_signup = "login";
+      } else if (this.login_signup == "signup") {
+        this.$refs['form_icon'].innerText = 'Login';
+        this.$refs['login_signup_btn'].innerText = "Signup";
+        this.login_signup = "login";
 
-        }
-        console.log(this.login_signup);
-      },
-      send_data(){
-        let self = this;
-
-        let url;
-        let data;
-        if (self.login_signup == "login") {
-          url = "http://localhost:8080/auth/login";
-          data = {
-            "email": self.email,
-            "password": self.password,
-            "captchaCode": self.captchaCode
-          }
-        }
-        if (self.login_signup == "signup") {
-          url = "http://localhost:8080/auth/signup";
-          data = {
-            "email": self.email,
-            "password": self.password,
-            "name": self.name,
-            "captchaCode": self.captchaCode
-          }
-        }
-        self.$apiUtil.postApi(url, data,
-                      response => {
-                        if (response.status === 401 || response.status === 400) {
-                          alert(response.msg);
-                          return;
-                        }
-                        console.log("redirect");
-                        self.$cache.loggedin = true;
-                        self.$router.push({path: 'VideosListPage'});
-                      },
-                      () => {
-                        alert("系統錯誤");
-                      });
-      },
-      createCaptcha() {
-        fetch('http://localhost:8080/auth/api/getCode', {
-                method: 'GET',
-                credentials: "include",
-              })
-              .then(resp => resp.text())
-              .then(resp => {
-                this.captchaImg = "data:image/jpeg;base64," + resp;
-              })
-              .catch(error => {
-                console.error('Error:', error);
-              });
       }
+      console.log(this.login_signup);
     },
-    computed: {
-      showNameInput() {
-        if (this.login_signup == "signup")
-          return true;
-        else if(this.login_signup == "login")
-          return false;
-
-        return false;
-      }
-    },
-    mounted() {
+    send_data() {
       let self = this;
-      self.createCaptcha();
+
+      let url;
+      let data;
+      if (self.login_signup == "login") {
+        url = "http://localhost:8080/auth/login";
+        data = {
+          "email": self.email,
+          "password": self.password,
+          "captchaCode": self.captchaCode
+        }
+      }
+      if (self.login_signup == "signup") {
+        url = "http://localhost:8080/auth/signup";
+        data = {
+          "email": self.email,
+          "password": self.password,
+          "name": self.name,
+          "captchaCode": self.captchaCode
+        }
+      }
+      self.$apiUtil.postApi(url, data,
+        response => {
+          if (response.status === 401 || response.status === 400) {
+            alert(response.msg);
+            return;
+          }
+          console.log("redirect");
+          self.$cache.loggedin = true;
+          self.$router.push({ path: 'VideosListPage' });
+        },
+        () => {
+          alert("系統錯誤");
+        });
     },
+    createCaptcha() {
+      fetch('http://localhost:8080/auth/api/getCode', {
+        method: 'GET',
+        credentials: "include",
+      })
+        .then(resp => resp.text())
+        .then(resp => {
+          this.captchaImg = "data:image/jpeg;base64," + resp;
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
+  },
+  computed: {
+    showNameInput() {
+      if (this.login_signup == "signup")
+        return true;
+      else if (this.login_signup == "login")
+        return false;
+
+      return false;
+    }
+  },
+  mounted() {
+    let self = this;
+    self.createCaptcha();
+  },
 }
 </script>
 
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Monoton&display=swap');
-    @import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
-    
-    .fake_body{
-        margin: 0;
-        padding: 0;
-        outline: none;
-        box-sizing: border-box;
-        font-family: 'Poppins', sans-serif;
-        height: 100vh;
-        width: 100%;
-        background: linear-gradient(115deg, #56d8e4 10%, #9f01ea 90%);
-    }
+@import url('https://fonts.googleapis.com/css2?family=Monoton&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
 
-    .hide_top_nav{
-        position: fixed;
-        top: 0%;
-        left: 0%;
-        right: 0%;
-        height: 56px;
-        z-index: 200;
-        background: linear-gradient(115deg, #41a3ac 10%, #8a01ca 90%);
-        opacity: 0.7;
-        
-    }
+.fake_body {
+  margin: 0;
+  padding: 0;
+  outline: none;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  height: 100vh;
+  width: 100%;
+  background: linear-gradient(115deg, #56d8e4 10%, #9f01ea 90%);
+}
 
-    .show-icon, .show-label-btn, .form_container{
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
-    .show-label-btn{
-      display: flex;
-      flex-direction: column;
-      margin-top: 20px;
-    }
-    .show-icon{
-        top: 40%;
-        padding: 10px 20px;
-        font-size: 4em;
-        font-weight: 500;
-        color:  #fff;
-        font-family: 'Monoton', cursive;
-    }
-    .show-label{
-        margin: auto;
-        padding: 10px 20px;
-        font-size: 20px;
-        font-weight: 500;
-        color:  #fff;
-    }
-    .show-btn{
-        margin: auto;
-        background: #fff;
-        padding: 10px 20px;
-        font-size: 20px;
-        font-weight: 500;
-        color: #3498db;
-        cursor: pointer;
-        box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-    }
+.hide_top_nav {
+  position: fixed;
+  top: 0%;
+  left: 0%;
+  right: 0%;
+  height: 56px;
+  z-index: 200;
+  background: linear-gradient(115deg, #41a3ac 10%, #8a01ca 90%);
+  opacity: 0.7;
 
-    input[type="checkbox"]{
-    display: none;
-    }
-    .form_container{
-      display: none;
-      background: #fff;
-      width: 410px;
-      padding: 30px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
-    }
-    #show:checked ~ .form_container{
-      display: block;
-    }
-    .form_container .close-btn{
-      position: absolute;
-      right: 20px;
-      top: 15px;
-      font-size: 18px;
-      cursor: pointer;
-    }
-    .form_container .close-btn:hover{
-      color: #3498db;
-    }
-    .form_container .text{
-      font-size: 35px;
-      font-weight: 600;
-      text-align: center;
-    }
-    .form_container .fake_form{
-      margin-top: -20px;
-    }
-    .form_container .fake_form .data{
-      height: 45px;
-      width: 100%;
-      margin: 40px 0;
-    }
-    .fake_form .data label{
-      font-size: 18px;
-    }
-    .fake_form .data input{
-      height: 100%;
-      width: 100%;
-      padding-left: 10px;
-      font-size: 17px;
-      border: 1px solid silver;
-    }
-    .fake_form .data input:focus{
-      border-color: #3498db;
-      border-bottom-width: 2px;
-    }
-    .fake_form .forgot-pass{
-      margin-top: -8px;
-    }
-    .fake_form .forgot-pass a{
-      color: #3498db;
-      text-decoration: none;
-    }
-    .fake_form .forgot-pass a:hover{
-      text-decoration: underline;
-    }
-    .fake_form .btn{
-      margin: 30px 0;
-      height: 45px;
-      width: 100%;
-      position: relative;
-      overflow: hidden;
-    }
-    .fake_form .btn .inner{
-      height: 100%;
-      width: 300%;
-      position: absolute;
-      left: -100%;
-      z-index: -1;
-      background: -webkit-linear-gradient(right, #56d8e4, #9f01ea, #56d8e4, #9f01ea);
-      transition: all 0.4s;
-    }
-    .fake_form .btn:hover .inner{
-      left: 0;
-    }
-    .fake_form .btn button{
-      height: 100%;
-      width: 100%;
-      background: none;
-      border: none;
-      color: #fff;
-      font-size: 18px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      cursor: pointer;
-    }
-    .fake_form .signup-link{
-      text-align: center;
-    }
-    .fake_form .signup-link a{
-      color: #3498db;
-      text-decoration: none;
-    }
-    .fake_form .signup-link a:hover{
-      text-decoration: underline;
-    }
-</style>
+}
+
+.show-icon,
+.show-label-btn,
+.form_container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.show-label-btn {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+}
+
+.show-icon {
+  top: 40%;
+  padding: 10px 20px;
+  font-size: 4em;
+  font-weight: 500;
+  color: #fff;
+  font-family: 'Monoton', cursive;
+}
+
+.show-label {
+  margin: auto;
+  padding: 10px 20px;
+  font-size: 20px;
+  font-weight: 500;
+  color: #fff;
+}
+
+.show-btn {
+  margin: auto;
+  background: #fff;
+  padding: 10px 20px;
+  font-size: 20px;
+  font-weight: 500;
+  color: #3498db;
+  cursor: pointer;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+/*第三方登入 
+  form
+*/
+.third_form {
+  display: flex;
+  justify-content: space-around;
+}
+
+/*第三方登入 
+  Wrapper
+*/
+.icon-button {
+  background-color: white;
+  border-radius: 3.6rem;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 2.0rem;
+  height: 3.6rem;
+  line-height: 3.6rem;
+  margin: 0 5px;
+  position: relative;
+  text-align: center;
+  user-select: none;
+  /* -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none; */
+  width: 3.6rem;
+}
+
+/*第三方登入 
+  Circle
+*/
+.icon-button span {
+  border-radius: 0;
+  display: block;
+  height: 0;
+  left: 50%;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  transition: all 0.3s;
+  /* -webkit-transition: all 0.3s;
+  -moz-transition: all 0.3s;
+  -o-transition: all 0.3s;
+  transition: all 0.3s; */
+  width: 0;
+}
+
+/*第三方登入 
+  Icons
+*/
+.icon-button:hover span {
+  width: 3.6rem;
+  height: 3.6rem;
+  border-radius: 3.6rem;
+  margin: -1.8rem;
+}
+
+.twitter span {
+  background-color: #4099ff;
+}
+
+.facebook span {
+  background-color: #3B5998;
+}
+
+.google-plus span {
+  background-color: #db5a3c;
+}
+
+.icon-button i {
+  background: none;
+  color: rgb(255, 255, 255);
+  height: 3.6rem;
+  position: absolute;
+  left: 0;
+  top: 0;
+  line-height: 3.6rem;
+  transition: all 0.3s;
+
+  /* -webkit-transition: all 0.3s;
+  -moz-transition: all 0.3s;
+  -o-transition: all 0.3s;
+  transition: all 0.3s; */
+  width: 3.6rem;
+  z-index: 10;
+}
+
+.icon-button .fab.fa-twitter {
+  color: #4099ff;
+}
+
+.icon-button .fab.fa-facebook {
+  color: #3B5998;
+}
+
+.icon-button .fab.fa-google {
+  color: #db5a3c;
+}
+
+.icon-button:hover .fab.fa-twitter,
+.icon-button:hover .fab.fa-facebook,
+.icon-button:hover .fab.fa-google {
+  color: white;
+}
+
+.or {
+  text-align: center;
+  font-weight: bold;
+  border-bottom: 2px solid rgb(245 239 239);
+  line-height: 0.1em;
+  margin: 25px 0;
+}
+
+.or span {
+  background: #fff;
+  padding: 0 10px;
+}
+
+input[type="checkbox"] {
+  display: none;
+}
+
+.form_container {
+  display: none;
+  background: #fff;
+  width: 410px;
+  padding: 30px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+#show:checked~.form_container {
+  display: block;
+}
+
+.form_container .close-btn {
+  position: absolute;
+  right: 20px;
+  top: 15px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.form_container .close-btn:hover {
+  color: #3498db;
+}
+
+.form_container .text {
+  font-size: 35px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.form_container .fake_form {
+  margin-top: -20px;
+}
+
+.form_container .fake_form .data {
+  height: 45px;
+  width: 100%;
+  margin: 40px 0;
+}
+
+.fake_form .data label {
+  font-size: 18px;
+}
+
+.fake_form .data input {
+  height: 100%;
+  width: 100%;
+  padding-left: 10px;
+  font-size: 17px;
+  border: 1px solid silver;
+}
+
+.fake_form .data input:focus {
+  border-color: #3498db;
+  border-bottom-width: 2px;
+}
+
+.fake_form .forgot-pass {
+  margin-top: -8px;
+}
+
+.fake_form .forgot-pass a {
+  color: #3498db;
+  text-decoration: none;
+}
+
+.fake_form .forgot-pass a:hover {
+  text-decoration: underline;
+}
+
+.fake_form .btn {
+  margin: 30px 0;
+  height: 45px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.fake_form .btn .inner {
+  height: 100%;
+  width: 300%;
+  position: absolute;
+  left: -100%;
+  z-index: -1;
+  background: -webkit-linear-gradient(right, #56d8e4, #9f01ea, #56d8e4, #9f01ea);
+  transition: all 0.4s;
+}
+
+.fake_form .btn:hover .inner {
+  left: 0;
+}
+
+.fake_form .btn button {
+  height: 100%;
+  width: 100%;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+.fake_form .signup-link {
+  text-align: center;
+}
+
+.fake_form .signup-link a {
+  color: #3498db;
+  text-decoration: none;
+}
+
+.fake_form .signup-link a:hover {
+  text-decoration: underline;
+}</style>
